@@ -1,8 +1,5 @@
 
 #include "arvoreCompleto.h"
-=======
-
->>>>>>> 6807462cc783375374039f2fc0af5daeb8f7641f
 
 
 //----------- parte 1: tabela de frequencia ----------------------
