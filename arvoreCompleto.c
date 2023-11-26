@@ -1,28 +1,9 @@
-/*
-          Código escrito por Wagner Gaspar
-          Novembro de 2021
-
-          OBS.: Para utilizar este código no sistema operacional Linux
-          retire a inclusão do arquivo de cabeçalho windows.h
-*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
+#include "arvoreCompleto.h"
 
-#define TAM 256
-
-typedef struct no{
-    unsigned char caracter;
-    int frequencia;
-    struct no *esq, *dir, *proximo;
-}No;
-
-typedef struct{
-    No *inicio;
-    int tam;
-}Lista;
 
 //----------- parte 1: tabela de frequencia ----------------------
 void inicializa_tabela_com_zero(unsigned int tab[]){
