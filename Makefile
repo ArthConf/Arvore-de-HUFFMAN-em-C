@@ -1,0 +1,1 @@
+all: clear ponteiro ponteiro_duplo linkedlist
