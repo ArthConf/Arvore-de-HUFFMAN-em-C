@@ -266,33 +266,8 @@ char* decodificar(unsigned char texto[], No *raiz){
 
 //-------------- parte 7: Compactar --------------------------
 void compactar(unsigned char str[]){
-    FILE *arquivo = fopen("compactado.wg", "wb");
     int i = 0, j = 7;
     unsigned char mascara, byte = 0; // 00000000
-
-    if(arquivo){
-        while(str[i] != '\0'){
-            mascara = 1;
-            if(str[i] == '1'){
-                mascara = mascara << j;
-                byte = byte | mascara;
-            }
-            j--;
-
-            if(j < 0){ // tem um byte formado
-                fwrite(&byte, sizeof(unsigned char), 1, arquivo);
-                byte = 0;
-                j = 7;
-            }
-
-            i++;
-        }
-        if(j != 7) //11010000
-            fwrite(&byte, sizeof(unsigned char), 1, arquivo);
-        fclose(arquivo);
-    }
-    else
-        printf("\nErro ao abrir/criar arquivo em compactar\n");
 }
 
 //-------------- parte 8: Descompactar ------------------------
@@ -302,30 +277,9 @@ unsigned int eh_bit_um(unsigned char byte, int i){
 }
 
 void descompactar(No *raiz){
-    FILE *arquivo = fopen("compactado.wg", "rb");
     No *aux = raiz;
     unsigned char byte; // 10111001
     int i;
-
-    if(arquivo){
-        while(fread(&byte, sizeof(unsigned char), 1, arquivo)){
-            for(i = 7; i >= 0; i--){
-                if(eh_bit_um(byte, i))
-                    aux = aux->dir;
-                else
-                    aux = aux->esq;
-
-                if(aux->esq == NULL && aux->dir == NULL){
-                    printf("%c", aux->caracter);
-                    
-                    aux = raiz;
-                }
-            }
-        }
-        fclose(arquivo);
-    }
-    else
-        printf("\nErro ao abrir arquivo em descompactar\n");
 }
 
 // função para descobrir o tamanho de um texto em arquivo texto (quantidade de caracteres)
@@ -353,16 +307,22 @@ void ler_texto(unsigned char *texto) {
         while (!feof(arq)) {
             letra = fgetc(arq);
             if (letra != -1) {
-                // printf("\t%d: %c\n", letra, letra);
                 texto[i] = letra;
                 i++;
             }
         }
+        
+        // Remover o último caractere
+        if (i > 0) {
+            texto[i - 1] = '\0';
+        }
+
         fclose(arq);
     } else {
         printf("\nErro ao abrir arquivo em ler_texto\n");
     }
 }
+
 
 void liberar_lista(No *raiz) {
     if (raiz) {
@@ -391,14 +351,13 @@ void intToBinaryString(int num, char *binaryString) {
     binaryString[8] = '\0'; // Adiciona o terminador nulo
 }
 
-// Função para imprimir a tabela comparativa
 void imprimirTabelaComparativa(char **dicionario) {
     printf("\n+--------------+-----------------------+--------------------------+");
     printf("\n| Caractere    | Binario ASCII        | Binario Huffman          |");
     printf("\n+--------------+-----------------------+--------------------------+");
 
     for (int i = 0; i < TAM; i++) {
-        if (strlen(dicionario[i]) > 0) {
+        if (strlen(dicionario[i]) > 0 && strchr(dicionario[i], '+') == NULL) {
             printf("\n|    %c         | ", i);
             
             // Binário ASCII
@@ -412,6 +371,19 @@ void imprimirTabelaComparativa(char **dicionario) {
     }
 
     printf("\n+--------------+-----------------------+--------------------------+\n");
+}
+
+// Função para imprimir o conteúdo codificado em um arquivo .txt
+void imprimir_em_arquivo(const char *nome_arquivo, const char *conteudo) {
+    FILE *arquivo = fopen("compactado.txt", "w");
+    
+    if (arquivo) {
+        fprintf(arquivo, "%s", conteudo);
+        fclose(arquivo);
+        printf("\nConteúdo codificado foi impresso no arquivo %s\n", "compactado.txt");
+    } else {
+        printf("\nErro ao abrir arquivo para escrita.\n");
+    }
 }
 
 int main() {
@@ -457,6 +429,8 @@ int main() {
     //----------- parte 5: Codificar ---------------------------
     codificado = codificar(dicionario, texto);
     printf("\nTEXTO CODIFICADO: %s\n", codificado);
+
+    imprimir_em_arquivo("saida.txt", codificado);
 
     //----------- parte 6: Decodificar -------------------------
     decodificado = decodificar(codificado, arvore);
