@@ -1,5 +1,6 @@
 #include <huffman.h>
 
+
 //----------- parte 1: tabela de frequencia ----------------------
 void inicializa_tabela_com_zero(unsigned int tab[]){
     int i;

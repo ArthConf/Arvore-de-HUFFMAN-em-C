@@ -1,3 +1,5 @@
+#include "arvoreCompleto.h"
+
 int main() {
 
     //unsigned char texto[] = "Vamos aprender programação";
@@ -9,8 +11,6 @@ int main() {
     char **dicionario;
     char *codificado, *decodificado;
 
-    // retire ou comente a linha a seguir para executar no Linux
-    SetConsoleOutputCP(65001);
 
     tam = descobrir_tamanho();
     printf("\nQuantidade: %d\n", tam);

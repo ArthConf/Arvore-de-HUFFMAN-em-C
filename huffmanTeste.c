@@ -1,6 +1,19 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include "arvoreCompleto.h"
+#define TAM 256
 
+typedef struct no{
+    unsigned char caracter;
+    int frequencia;
+    struct no *esq, *dir, *proximo;
+}No;
+
+typedef struct{
+    No *inicio;
+    int tam;
+}Lista;
 
 //----------- parte 1: tabela de frequencia ----------------------
 void inicializa_tabela_com_zero(unsigned int tab[]){
@@ -21,7 +34,8 @@ void preenche_tab_frequencia(unsigned char texto[], unsigned int tab[]){
 void imprime_tab_frequencia(unsigned int tab[]){
     int i;
 
-    printf("\tTABELA DE FREQUENCIA\n");
+
+    printf("\nTABELA DE FREQUENCIA\n");
     for(i = 0; i < TAM; i++){
         if(tab[i] > 0)
             printf("\t%d = %u = %c\n", i, tab[i], i);
@@ -85,7 +99,7 @@ void preencher_lista(unsigned int tab[], Lista *lista){
 void imprimir_lista(Lista *lista){
     No *aux = lista->inicio;
 
-    printf("\n\tLista ordenada: Tamanho: %d\n", lista->tam);
+    printf("\nLISTA ORDENADA: TAMANHO: %d\n", lista->tam);
     while(aux){
         printf("\tCaracter: %c Frequencia: %d\n", aux->caracter, aux->frequencia);
         aux = aux->proximo;
@@ -190,7 +204,7 @@ void gerar_dicionario(char **dicionario, No *raiz, char *caminho, int colunas){
 void imprime_dicionario(char **dicionario){
     int i;
 
-    printf("\n\tDicionario:\n");
+    printf("\nDICIONARIO:\n");
     for(i = 0; i < TAM; i++){
         if(strlen(dicionario[i]) > 0)
             printf("\t%3d: %s\n", i, dicionario[i]);
@@ -298,6 +312,7 @@ void descompactar(No *raiz){
 
                 if(aux->esq == NULL && aux->dir == NULL){
                     printf("%c", aux->caracter);
+                    
                     aux = raiz;
                 }
             }
@@ -324,22 +339,102 @@ int descobrir_tamanho(){
 }
 
 // função para ler um texto de um arquivo texto
-void ler_texto(unsigned char *texto){
+void ler_texto(unsigned char *texto) {
     FILE *arq = fopen("teste.txt", "r");
     unsigned char letra;
     int i = 0;
 
-    if(arq){
-        while(!feof(arq)){
+    if (arq) {
+        while (!feof(arq)) {
             letra = fgetc(arq);
-            if(letra != -1){
-                //printf("%d: %c\n", letra, letra);
+            if (letra != -1) {
+                // printf("\t%d: %c\n", letra, letra);
                 texto[i] = letra;
                 i++;
             }
         }
         fclose(arq);
+    } else {
+        printf("\nErro ao abrir arquivo em ler_texto\n");
     }
-    else
-        printf("\nErro ao abri arquivo em ler_texto\n");
+}
+
+void liberar_lista(No *raiz) {
+    if (raiz) {
+        liberar_lista(raiz->esq);
+        liberar_lista(raiz->dir);
+        free(raiz);
+    }
+}
+
+void liberar_dicionario(char **dicionario, int colunas) {
+    for (int i = 0; i < TAM; i++) {
+        free(dicionario[i]);
+    }
+    free(dicionario);
+}
+
+int main() {
+
+    //unsigned char texto[] = "Vamos aprender programação";
+    unsigned char *texto;
+    unsigned int tabela_frequencia[TAM];
+    Lista lista;
+    No *arvore;
+    int colunas, tam;
+    char **dicionario;
+    char *codificado, *decodificado;
+
+    tam = descobrir_tamanho();
+    printf("\nQUANTIDADE: %d\n", tam);
+
+    texto = calloc(tam + 2, sizeof(unsigned char));
+    ler_texto(texto);
+    //printf("\nTEXTO:\n%s\n", texto);
+
+
+    //----------- parte 1: tabela de frequência ---------------
+    inicializa_tabela_com_zero(tabela_frequencia);
+    preenche_tab_frequencia(texto, tabela_frequencia);
+    imprime_tab_frequencia(tabela_frequencia);
+
+    //----------- parte 2: Lista Encadeada Ordenada -----------
+    criar_lista(&lista);
+    preencher_lista(tabela_frequencia, &lista);
+    imprimir_lista(&lista);
+
+    //----------- parte 3: Montar a Árvore de Huffman ---------
+    arvore = montar_arvore(&lista);
+    printf("\nARVORE DE HUFFMAN\n");
+    imprimir_arvore(arvore, 0);
+
+    //----------- parte 4: Montar o dicionário ----------------
+    colunas = altura_arvore(arvore) + 1;
+    dicionario = aloca_dicionario(colunas);
+    gerar_dicionario(dicionario, arvore, "", colunas);
+    imprime_dicionario(dicionario);
+
+    //----------- parte 5: Codificar ---------------------------
+    codificado = codificar(dicionario, texto);
+    printf("\nTEXTO CODIFICADO: %s\n", codificado);
+
+    //----------- parte 6: Decodificar -------------------------
+    decodificado = decodificar(codificado, arvore);
+    printf("\nTEXTO DECODIFICADO: %s\n", decodificado);
+
+    //----------- parte 7: Compactar ----------------------------
+    compactar(codificado);
+
+    //----------- parte 8: Descompactar ----------------------------
+    printf("\nARQUIVO DESCOMPACTADO!\n");
+    descompactar(arvore);
+    printf("\n\n");
+
+    free(texto);
+    free(codificado);
+    free(decodificado);
+    liberar_lista(arvore);
+    liberar_dicionario(dicionario, colunas);
+    
+    return 0;
 }
