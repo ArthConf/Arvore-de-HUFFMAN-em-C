@@ -1,8 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
+#include <wchar.h>
 
 #define TAM 256
+  // Configuração da localização para Português (Portugal) em UTF-8
+
+
 
 typedef struct no{
     unsigned char caracter;
@@ -374,8 +379,43 @@ void liberar_dicionario(char **dicionario, int colunas) {
     free(dicionario);
 }
 
-int main() {
+// Função para converter um número para uma string binária
+void intToBinaryString(int num, char *binaryString) {
+    int i, j;
 
+    for (i = 7; i >= 0; --i) {
+        j = 1 << i;
+        binaryString[7 - i] = (num & j) ? '1' : '0';
+    }
+
+    binaryString[8] = '\0'; // Adiciona o terminador nulo
+}
+
+// Função para imprimir a tabela comparativa
+void imprimirTabelaComparativa(char **dicionario) {
+    printf("\n+--------------+-----------------------+--------------------------+");
+    printf("\n| Caractere    | Binario ASCII        | Binario Huffman          |");
+    printf("\n+--------------+-----------------------+--------------------------+");
+
+    for (int i = 0; i < TAM; i++) {
+        if (strlen(dicionario[i]) > 0) {
+            printf("\n|    %c         | ", i);
+            
+            // Binário ASCII
+            char binarioASCII[9]; // 8 bits + terminador nulo
+            intToBinaryString(i, binarioASCII);
+            printf("%s         | ", binarioASCII);
+
+            // Binário Huffman
+            printf("    %s                |", dicionario[i]);
+        }
+    }
+
+    printf("\n+--------------+-----------------------+--------------------------+\n");
+}
+
+int main() {
+    
     //unsigned char texto[] = "Vamos aprender programação";
     unsigned char *texto;
     unsigned int tabela_frequencia[TAM];
@@ -430,11 +470,15 @@ int main() {
     descompactar(arvore);
     printf("\n\n");
 
+    // Imprimir a tabela comparativa
+    imprimirTabelaComparativa(dicionario);
+
+    // Liberação de memória
     free(texto);
     free(codificado);
     free(decodificado);
     liberar_lista(arvore);
     liberar_dicionario(dicionario, colunas);
-    
+
     return 0;
 }
