@@ -192,9 +192,31 @@ char* codificar(char **dicionario, unsigned char *texto){
 }
 
 //COMPACTAÇÃO
-void compactar(unsigned char str[]){
-    int i = 0, j = 7;
-    unsigned char mascara, byte = 0; 
+void compactar(unsigned char str[]) {
+    FILE *arquivoCompactado = fopen("compactado.bin", "wb"); // Abre o arquivo binário em modo de escrita
+
+    if (arquivoCompactado == NULL) {
+        printf("\nERRO AO ABRIR ARQUIVO COMPACTADO!!!\n");
+        return;
+    }
+
+    int i = 0;
+    unsigned char mascara, byte = 0;
+
+    while (str[i] != '\0') {
+        mascara = 1 << (7 - (i % 8));
+        byte |= (str[i] == '1') ? mascara : 0;
+
+        if ((i + 1) % 8 == 0) {
+            fwrite(&byte, 1, 1, arquivoCompactado);
+            byte = 0;
+        }
+
+        i++;
+    }
+
+    fclose(arquivoCompactado);
+    printf("\nARQUIVO COMPACTADO COM SUCESSO!\n");
 }
 
 //CONTAR O TAMANHO DO TEXTO NO ARQUIVO
@@ -289,13 +311,13 @@ void imprimirTabelaComparativa(char **dicionario) {
 }
 
 // Função para imprimir o conteúdo codificado em um arquivo .txt
-void imprimir_em_arquivo(const char *nome_arquivo, const char *conteudo) {
-    FILE *arquivo = fopen("compactado.txt", "w");//Nome do Arquivo que será criado, cujo conteúdo sera de valor binário
-    
+void imprimir_em_arquivo(const char *nome_arquivo, const char *conteudo_binario) {
+    FILE *arquivo = fopen(nome_arquivo, "wb"); // Abre o arquivo binário em modo de escrita
+
     if (arquivo) {
-        fprintf(arquivo, "%s", conteudo);
+        fwrite(conteudo_binario, 1, strlen(conteudo_binario), arquivo);
         fclose(arquivo);
-        printf("\nO CONTEÚDO CODIFICADO FOI IMPRESSO NO ARQUIVO %s\n", "compactado.txt");
+        printf("\nO CONTEÚDO COMPACTADO FOI IMPRESSO NO ARQUIVO %s\n", nome_arquivo);
     } else {
         printf("\nERRO AO ABRIR ARQUIVO!!!\n");
     }

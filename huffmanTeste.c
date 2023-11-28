@@ -52,7 +52,7 @@ int main() {
 
     //CODIFICAÇÃO E IMPRESSÃO DE ARQUIVO
         codificado = codificar(dicionario, texto);
-        imprimir_em_arquivo("saida.txt", codificado); //IMPRIME UM ARQUIVO COMPACTADO DO ARQUIVO 
+        imprimir_em_arquivo("compactado.txt", codificado); //IMPRIME UM ARQUIVO COMPACTADO DO ARQUIVO 
     //COMPACTAÇÃO
         compactar(codificado);
 
@@ -60,15 +60,13 @@ int main() {
         printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
         imprimirTabelaComparativa(dicionario);
     //Para fazer comparação de tamanho, transformei o arquivo teste.txt em binário, seguindo a tabela ASCII
-    //Primeiro valor é o arquivo forncedio original, e o segundo é o arquivo com conteudo binário gerado
     printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-    if (ler_converter_escrever_binario("teste.txt", "original_binario.txt") == 0) {
-        printf("O arquivo .txt fornecido por você, foi transformado em binário com sucesso!\n");
+    // Convertendo teste.txt para um arquivo binário teste.bin
+    if (ler_converter_escrever_binario("teste.txt", "teste.bin") == 0) {
+        printf("O arquivo teste.txt foi transformado em binário com sucesso!\n");
     }
-    //Compara o tamanho dos dois arquivos em binario. Sendo o primeiro o arquivo em binário gerado pelo arquivo dado pelo usuário
-    // O segundo é o arquivo compactado gerado pelo codigo.
 
-    comparar_tamanhos("original_binario.txt", "compactado.txt");
+    comparar_tamanhos("teste.bin", "compactado.bin");
     //LIBERAR MEMÓRIA
         free(texto);
         free(codificado);
