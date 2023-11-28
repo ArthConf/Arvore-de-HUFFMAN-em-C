@@ -1,14 +1,13 @@
-#include <huffman.h>
+#include "huffman.h"
 
-
-//----------- parte 1: tabela de frequencia ----------------------
-void inicializa_tabela_com_zero(unsigned int tab[]){
+//FREQUÊNCIA
+void inicializaTabela(unsigned int tab[]){
     int i;
     for(i = 0; i < TAM; i++)
         tab[i] = 0;
 }
 
-void preenche_tab_frequencia(unsigned char texto[], unsigned int tab[]){
+void preencherTabelaFrequencia(unsigned char texto[], unsigned int tab[]){
     int i = 0;
 
     while(texto[i] != '\0'){
@@ -17,18 +16,7 @@ void preenche_tab_frequencia(unsigned char texto[], unsigned int tab[]){
     }
 }
 
-void imprime_tab_frequencia(unsigned int tab[]){
-    int i;
-
-    printf("\tTABELA DE FREQUENCIA\n");
-    for(i = 0; i < TAM; i++){
-        if(tab[i] > 0)
-            printf("\t%d = %u = %c\n", i, tab[i], i);
-    }
-}
-
-//----------- parte 2: Lista Encadeada Ordenada ----------------------
-
+//LISTA ENCADEADA ORDENADA
 void criar_lista(Lista *lista){
     lista->inicio = NULL;
     lista->tam = 0;
@@ -36,16 +24,12 @@ void criar_lista(Lista *lista){
 
 void inserir_ordenado(Lista *lista, No *no){
     No *aux;
-    // a lista esta vazia?
     if(lista->inicio == NULL){
         lista->inicio = no;
-        //lista->tam++;
     }
-    // tem frequencia menor que o inicio da lista
     else if(no->frequencia < lista->inicio->frequencia){
         no->proximo = lista->inicio;
         lista->inicio = no;
-        //lista->tam++;
     }
     else{
         aux = lista->inicio;
@@ -53,7 +37,6 @@ void inserir_ordenado(Lista *lista, No *no){
             aux = aux->proximo;
         no->proximo = aux->proximo;
         aux->proximo = no;
-        //lista->tam++;
     }
     lista->tam++;
 }
@@ -74,25 +57,26 @@ void preencher_lista(unsigned int tab[], Lista *lista){
                 inserir_ordenado(lista, novo);
             }
             else{
-                printf("\tERRO ao alocar memoria em preencher_lista!\n");
+                printf("\tERRO AO ALOCAR MEMORIA\n");
                 break;
             }
         }
     }
 }
 
+//IMPRIME A LISTA ENCADEADA ORDENADA, E O SEU TAMANHO. OU SEJA, O TAMANHO DO CONTEUDO NO ARQUIVO E IMPRIME
+//CADA CARACTER E A SUA FREQUÊNCIA AO LONGO DO TEXTO.
 void imprimir_lista(Lista *lista){
     No *aux = lista->inicio;
 
-    printf("\n\tLista ordenada: Tamanho: %d\n", lista->tam);
+    printf("\nLISTA ORDENADA: TAMANHO: %d\n", lista->tam);
     while(aux){
         printf("\tCaracter: %c Frequencia: %d\n", aux->caracter, aux->frequencia);
         aux = aux->proximo;
     }
 }
 
-//------------- parte 3: Montar a Arvore de Huffman ----------------------
-
+//ÁRVORE DE HUFFMAN
 No* remove_no_inicio(Lista *lista){
     No *aux = NULL;
 
@@ -139,8 +123,7 @@ void imprimir_arvore(No *raiz, int tam){
     }
 }
 
-//-------------- parte 4: Montar o dicionario ---------------------
-
+//DICIONARIO: COMPARAR O CARACTER E SEU EQUIVALENTE BINARIO OU ATÉ MESMO COMPARAR COM BINÁRIO HUFFMAN
 int altura_arvore(No *raiz){
     int esq, dir;
 
@@ -186,18 +169,7 @@ void gerar_dicionario(char **dicionario, No *raiz, char *caminho, int colunas){
     }
 }
 
-void imprime_dicionario(char **dicionario){
-    int i;
-
-    printf("\n\tDicionario:\n");
-    for(i = 0; i < TAM; i++){
-        if(strlen(dicionario[i]) > 0)
-            printf("\t%3d: %s\n", i, dicionario[i]);
-    }
-}
-
-//-------------- parte 5: Codificar ----------------------------
-
+//CODIFICAÇÃO
 int calcula_tamanho_string(char **dicionoario, unsigned char *texto){
     int i = 0, tam = 0;
     while(texto[i] != '\0'){
@@ -219,95 +191,13 @@ char* codificar(char **dicionario, unsigned char *texto){
     return codigo;
 }
 
-//-------------- parte 6: Decodificar --------------------------
-char* decodificar(unsigned char texto[], No *raiz){
-    int i = 0;
-    No *aux = raiz;
-    char temp[2];
-    char *decodificado = calloc(strlen(texto), sizeof(char));
-
-    while(texto[i] != '\0'){
-        if(texto[i] == '0')
-            aux = aux->esq;
-        else
-            aux = aux->dir;
-
-        if(aux->esq == NULL && aux->dir == NULL){
-            temp[0] = aux->caracter;
-            temp[1] = '\0';
-            strcat(decodificado, temp);
-            aux = raiz;
-        }
-
-        i++;
-    }
-    return decodificado;
-}
-
-//-------------- parte 7: Compactar --------------------------
+//COMPACTAÇÃO
 void compactar(unsigned char str[]){
-    FILE *arquivo = fopen("compactado.wg", "wb");
     int i = 0, j = 7;
-    unsigned char mascara, byte = 0; // 00000000
-
-    if(arquivo){
-        while(str[i] != '\0'){
-            mascara = 1;
-            if(str[i] == '1'){
-                mascara = mascara << j;
-                byte = byte | mascara;
-            }
-            j--;
-
-            if(j < 0){ // tem um byte formado
-                fwrite(&byte, sizeof(unsigned char), 1, arquivo);
-                byte = 0;
-                j = 7;
-            }
-
-            i++;
-        }
-        if(j != 7) //11010000
-            fwrite(&byte, sizeof(unsigned char), 1, arquivo);
-        fclose(arquivo);
-    }
-    else
-        printf("\nErro ao abrir/criar arquivo em compactar\n");
+    unsigned char mascara, byte = 0; 
 }
 
-//-------------- parte 8: Descompactar ------------------------
-unsigned int eh_bit_um(unsigned char byte, int i){
-    unsigned char mascara = (1 << i);
-    return byte & mascara;
-}
-
-void descompactar(No *raiz){
-    FILE *arquivo = fopen("compactado.wg", "rb");
-    No *aux = raiz;
-    unsigned char byte; // 10111001
-    int i;
-
-    if(arquivo){
-        while(fread(&byte, sizeof(unsigned char), 1, arquivo)){
-            for(i = 7; i >= 0; i--){
-                if(eh_bit_um(byte, i))
-                    aux = aux->dir;
-                else
-                    aux = aux->esq;
-
-                if(aux->esq == NULL && aux->dir == NULL){
-                    printf("%c", aux->caracter);
-                    aux = raiz;
-                }
-            }
-        }
-        fclose(arquivo);
-    }
-    else
-        printf("\nErro ao abrir arquivo em descompactar\n");
-}
-
-// função para descobrir o tamanho de um texto em arquivo texto (quantidade de caracteres)
+//CONTAR O TAMANHO DO TEXTO NO ARQUIVO
 int descobrir_tamanho(){
     FILE *arq = fopen("teste.txt", "r");
     int tam = 0;
@@ -318,30 +208,96 @@ int descobrir_tamanho(){
         fclose(arq);
     }
     else
-        printf("\nErro ao abri arquivo em descobrir_tamanho\n");
+        printf("\nERRO AO ABRIR ARQUIVO!!!\n");
     return tam;
 }
 
-// função para ler um texto de um arquivo texto
-void ler_texto(unsigned char *texto){
-    FILE *arq = fopen("teste.txt", "r");
+//LEITURA DE ARQUIVO
+void ler_texto(unsigned char *texto) {
+    FILE *arq = fopen("teste.txt", "r"); // Aqui deve colocar o arquivo que deseja compactar
     unsigned char letra;
     int i = 0;
 
-    if(arq){
-        while(!feof(arq)){
+    if (arq) {
+        while (!feof(arq)) {
             letra = fgetc(arq);
-            if(letra != -1){
-                //printf("%d: %c\n", letra, letra);
+            if (letra != -1) {
                 texto[i] = letra;
                 i++;
             }
         }
+        
+        // Essa função remove o último caracter, já que ele é um bug. Foi feito para evitar contagem de caracteres inexistentes.
+        if (i > 0) {
+            texto[i - 1] = '\0';
+        }
+
         fclose(arq);
+    } else {
+        printf("\nERRO AO ABRIR ARQUIVO!!!\n");
     }
-    else
-        printf("\nErro ao abri arquivo em ler_texto\n");
 }
 
 
+void liberar_lista(No *raiz) {
+    if (raiz) {
+        liberar_lista(raiz->esq);
+        liberar_lista(raiz->dir);
+        free(raiz);
+    }
+}
+
+void liberar_dicionario(char **dicionario, int colunas) {
+    for (int i = 0; i < TAM; i++) {
+        free(dicionario[i]);
+    }
+    free(dicionario);
+}
+
+//CONVERTER DECIMAL PARA BINÁRIO
+void intToBinaryString(int num, char *binaryString) {
+    int i, j;
+
+    for (i = 7; i >= 0; --i) {
+        j = 1 << i;
+        binaryString[7 - i] = (num & j) ? '1' : '0';
+    }
+
+    binaryString[8] = '\0'; // Adiciona o terminador nulo
+}
+
+void imprimirTabelaComparativa(char **dicionario) {
+    printf("\n-------------------------------------------------------------------");
+    printf("\n| Caractere    | Binario ASCII        | Binario Huffman          |");
+    printf("\n-------------------------------------------------------------------");
+
+    for (int i = 0; i < TAM; i++) {
+        if (strlen(dicionario[i]) > 0 && strchr(dicionario[i], '+') == NULL) {
+            printf("\n|    %c         | ", i);
+            
+            // Binário ASCII
+            char binarioASCII[9]; // 8 bits + terminador nulo
+            intToBinaryString(i, binarioASCII);
+            printf("%s         | ", binarioASCII);
+
+            // Binário Huffman
+            printf("    %s                |", dicionario[i]);
+        }
+    }
+
+    printf("\n-------------------------------------------------------------------\n");
+}
+
+// Função para imprimir o conteúdo codificado em um arquivo .txt
+void imprimir_em_arquivo(const char *nome_arquivo, const char *conteudo) {
+    FILE *arquivo = fopen("compactado.txt", "w");//Nome do Arquivo que será criado, cujo conteúdo sera de valor binário
+    
+    if (arquivo) {
+        fprintf(arquivo, "%s", conteudo);
+        fclose(arquivo);
+        printf("\nO CONTEÚDO CODIFICADO FOI IMPRESSO NO ARQUIVO %s\n", "compactado.txt");
+    } else {
+        printf("\nERRO AO ABRIR ARQUIVO!!!\n");
+    }
+}
 
