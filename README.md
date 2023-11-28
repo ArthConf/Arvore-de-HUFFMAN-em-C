@@ -1,27 +1,9 @@
-# HUFFMAN
-Trabalho de Árvore de HUFFMAN, visando a utilização do método de HUFFMAN na compressão de 
-arquivos .txt
+# Arvore
+Trabalho de arvore de compressão
 
-Este código exibe os seguintes resultados no terminal:
-
---> QUANTIDADE DE CARACTERES
-
---> Lista Ordenada e Frequência de cada caracter
-
---> Árvore de HUFFMAN
-
---> Compacta o arquivo "teste.txt" e gera um arquivo binário "compactado.txt"
-
---> Compara o binário em ASCII com o binário depois de tratado na codificação em HUFFMAN
-
---> Exibe o tamanho dos dois arquivos em formato binárioo, tanto o original "teste.txt"(ele vira original_binario.txt") e o "compactado.txt"
-
---> Diferença de Bytes entre os dois arquivos
-
---> Porcentagem de compressão
-
-#Compilação
-Para compilar execute:
-```shell
-make install
-```
+IFMT - CAMPUS CUIABÁ - CEL. OCTAYDE JORGE DA SILVA
+CUIABÁ, 22 DE NOVEMBRO DE 2023
+PROFº JOÃO PAULO PRETI
+DISCIPLINA: ESTRUTURA DE DADOS II
+CURSO E PERIODO: ENGENHARIA DA COMPUTAÇÃO - 4º SEMESTRE
+ALUNOS: ARTHUR OCTÁVIO OLIVEIRA CONFESSOR E NICOLAS FALCÃO HEEMANN
