@@ -65,9 +65,7 @@ int main() {
     if (ler_converter_escrever_binario("teste.txt", "teste.bin") == 0) {
         printf("O arquivo teste.txt foi transformado em binário com sucesso!\n");
     }
-    //----------- parte 6: Decodificar -------------------------
-    decodificado = decodificar("codificado", arvore);
-    printf("\nTEXTO DECODIFICADO: %s\n", decodificado);
+    //COMPARAÇÃO DE TAMANHOS ENTRE OS ARQUIVOS BINÁRIO ORIGINAL E COMPACTADO PÓS HUFFMAN
     comparar_tamanhos("teste.bin", "compactado.bin");
     //DECODIFICANDO O ARQUIVO COMPACTADO.BIN E IMPRIMINDO O QUE ESTA ESCRITO EM BINÁRIO
     decodificar_arquivo("compactado.bin", arvore);
