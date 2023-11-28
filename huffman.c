@@ -69,7 +69,7 @@ void preencher_lista(unsigned int tab[], Lista *lista){
 void imprimir_lista(Lista *lista){
     No *aux = lista->inicio;
 
-    printf("\nLISTA ORDENADA: TAMANHO: %d\n", lista->tam);
+    printf("LISTA ORDENADA: TAMANHO: %d\n", lista->tam);
     while(aux){
         printf("\tCaracter: %c Frequencia: %d\n", aux->caracter, aux->frequencia);
         aux = aux->proximo;
@@ -301,3 +301,105 @@ void imprimir_em_arquivo(const char *nome_arquivo, const char *conteudo) {
     }
 }
 
+// Função para converter um caractere para uma string binária
+void charToBinaryString(unsigned char c, char *binaryString) {
+    for (int i = 7; i >= 0; --i) {
+        binaryString[7 - i] = (c & (1 << i)) ? '1' : '0';
+    }
+    binaryString[8] = '\0'; // Adiciona o terminador nulo
+}
+
+// Função para escrever o conteúdo binário em um arquivo
+void escrever_binario_em_arquivo(const char *nome_arquivo, const char *conteudo_binario) {
+    FILE *arquivo = fopen(nome_arquivo, "w"); // Abre o arquivo em modo de texto
+
+    if (arquivo) {
+        fprintf(arquivo, "%s", conteudo_binario);
+        fclose(arquivo);
+    } else {
+        printf("\nERRO AO ABRIR ARQUIVO!!!\n");
+    }
+}
+
+// Função para calcular o tamanho de um arquivo em bytes
+int tamanho_em_bytes(const char *nome_arquivo) {
+    FILE *arquivo = fopen(nome_arquivo, "rb"); // Abre o arquivo em modo binário
+
+    if (arquivo == NULL) {
+        printf("\nERRO AO ABRIR ARQUIVO!!!\n");
+        return -1;
+    }
+
+    fseek(arquivo, 0, SEEK_END);
+    int tamanho = ftell(arquivo);
+    fclose(arquivo);
+
+    return tamanho;
+}
+
+//Comparação entre o arquivo original e o arquivo compactado e diferença de tamanho de Bytes entre os dois
+void comparar_tamanhos(const char *arquivo1, const char *arquivo2) {
+    int tamanho1 = tamanho_em_bytes(arquivo1);
+    int tamanho2 = tamanho_em_bytes(arquivo2);
+    if (tamanho1 != -1 && tamanho2 != -1) {
+        printf("\nTamanho do arquivo %s: %d bytes\n", arquivo1, tamanho1);
+        printf("Tamanho do arquivo %s: %d bytes\n", arquivo2, tamanho2);
+        int diferenca = tamanho1 - tamanho2;
+        float percCompac = (diferenca * 100) / tamanho1;
+        printf("Diferença de bytes entre os dois arquivos: %d bytes\n", diferenca);
+        printf("\nPercentual de compactação: %.2f%%\n\n",percCompac);
+    }
+}
+
+int ler_converter_escrever_binario(const char *nome_arquivo, const char *nome_arquivo_binario) {
+    FILE *arq = fopen(nome_arquivo, "r");
+
+    if (arq == NULL) {
+        printf("\nERRO AO ABRIR ARQUIVO!!!\n");
+        return 1;
+    }
+
+    // Obtém o tamanho do arquivo
+    fseek(arq, 0, SEEK_END);
+    long tamanho = ftell(arq);
+    fseek(arq, 0, SEEK_SET);
+
+    // Aloca memória para armazenar o conteúdo do arquivo
+    char *conteudo = (char *)malloc(tamanho + 1);
+    if (conteudo == NULL) {
+        printf("\nERRO AO ALOCAR MEMÓRIA!!!\n");
+        fclose(arq);
+        return 1;
+    }
+
+    // Lê o conteúdo do arquivo
+    fread(conteudo, 1, tamanho, arq);
+    fclose(arq);
+
+    // Adiciona o terminador nulo ao final do conteúdo
+    conteudo[tamanho] = '\0';
+
+    // Converte o conteúdo para binário
+    char *conteudo_binario = (char *)malloc(tamanho * 8 + 1);
+    if (conteudo_binario == NULL) {
+        printf("\nERRO AO ALOCAR MEMÓRIA!!!\n");
+        free(conteudo);
+        return 1;
+    }
+
+    for (int i = 0; i < tamanho; ++i) {
+        charToBinaryString(conteudo[i], &conteudo_binario[i * 8]);
+    }
+
+    // Adiciona o terminador nulo ao final do conteúdo binário
+    conteudo_binario[tamanho * 8] = '\0';
+
+    // Escreve o conteúdo binário em um novo arquivo
+    escrever_binario_em_arquivo(nome_arquivo_binario, conteudo_binario);
+
+    // Libera a memória alocada
+    free(conteudo);
+    free(conteudo_binario);
+
+    return 0;
+}

@@ -24,9 +24,11 @@ int main() {
         char **dicionario;
         char *codificado, *decodificado;
 
-        tam = descobrir_tamanho(); 
-        printf("QUANTIDADE: %d\n", tam); //QUANTIDADE DE CARACTER 
+        FILE *arq = fopen("teste.txt", "r");
 
+        tam = descobrir_tamanho(); 
+        printf("QUANTIDADE DE CARACTERES: %d\n", tam); //QUANTIDADE DE CARACTER 
+        printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
         texto = calloc(tam + 2, sizeof(unsigned char));
         ler_texto(texto);
 
@@ -39,8 +41,9 @@ int main() {
         imprimir_lista(&lista);
 
     //Árvore de Huffman 
+        printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
         arvore = montar_arvore(&lista);
-        printf("\nARVORE DE HUFFMAN\n");
+        printf("ARVORE DE HUFFMAN\n");
         imprimir_arvore(arvore, 0);
 
         colunas = altura_arvore(arvore) + 1;
@@ -54,13 +57,24 @@ int main() {
         compactar(codificado);
 
     //TABELA COMPARATIVA ENTRE ASCII E HUFFMAN
+        printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
         imprimirTabelaComparativa(dicionario);
+    //Para fazer comparação de tamanho, transformei o arquivo teste.txt em binário, seguindo a tabela ASCII
+    //Primeiro valor é o arquivo forncedio original, e o segundo é o arquivo com conteudo binário gerado
+    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+    if (ler_converter_escrever_binario("teste.txt", "original_binario.txt") == 0) {
+        printf("O arquivo .txt fornecido por você, foi transformado em binário com sucesso!\n");
+    }
+    //Compara o tamanho dos dois arquivos em binario. Sendo o primeiro o arquivo em binário gerado pelo arquivo dado pelo usuário
+    // O segundo é o arquivo compactado gerado pelo codigo.
 
+    comparar_tamanhos("original_binario.txt", "compactado.txt");
     //LIBERAR MEMÓRIA
         free(texto);
         free(codificado);
         liberar_lista(arvore);
         liberar_dicionario(dicionario, colunas);
+        printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
         printf("\nObrigado por usar COMPACTHANOS!! :D\n\n");
         return 0;
     }else{
