@@ -31,13 +31,12 @@ int main() {
         printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
         texto = calloc(tam + 2, sizeof(unsigned char));
         ler_texto(texto);
-
         inicializaTabela(tabela_frequencia);
         preencherTabelaFrequencia(texto, tabela_frequencia);
-
     //Lista Encadeada Ordenada
         criar_lista(&lista);
         preencher_lista(tabela_frequencia, &lista);
+        
         imprimir_lista(&lista);
 
     //Árvore de Huffman 
@@ -61,21 +60,27 @@ int main() {
         imprimirTabelaComparativa(dicionario);
     //Para fazer comparação de tamanho, transformei o arquivo teste.txt em binário, seguindo a tabela ASCII
     printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+
     // Convertendo teste.txt para um arquivo binário teste.bin
     if (ler_converter_escrever_binario("teste.txt", "teste.bin") == 0) {
         printf("O arquivo teste.txt foi transformado em binário com sucesso!\n");
     }
-
+    //----------- parte 6: Decodificar -------------------------
+    decodificado = decodificar("codificado", arvore);
+    printf("\nTEXTO DECODIFICADO: %s\n", decodificado);
     comparar_tamanhos("teste.bin", "compactado.bin");
+    //DECODIFICANDO O ARQUIVO COMPACTADO.BIN E IMPRIMINDO O QUE ESTA ESCRITO EM BINÁRIO
+    decodificar_arquivo("compactado.bin", arvore);
     //LIBERAR MEMÓRIA
         free(texto);
         free(codificado);
         liberar_lista(arvore);
         liberar_dicionario(dicionario, colunas);
         printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+        
         printf("\nObrigado por usar COMPACTHANOS!! :D\n\n");
         return 0;
-    }else{
+    } else {
         system("clear");
         printf("Obrigado por acessar o COMPACTHANOS, o melhor software de compactação de Cuiaba\n");
     }

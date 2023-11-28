@@ -191,9 +191,34 @@ char* codificar(char **dicionario, unsigned char *texto){
     return codigo;
 }
 
-//COMPACTAÇÃO
+//DECODIFICANDO O ARQUIVO
+char* decodificar(unsigned char texto[], No *raiz){
+    int i = 0;
+    No *aux = raiz;
+    char temp[2];
+    char *decodificado = calloc(strlen(texto), sizeof(char));
+
+    while(texto[i] != '\0'){
+        if(texto[i] == '0')
+            aux = aux->esq;
+        else
+            aux = aux->dir;
+
+        if(aux->esq == NULL && aux->dir == NULL){
+            temp[0] = aux->caracter;
+            temp[1] = '\0';
+            strcat(decodificado, temp);
+            aux = raiz;
+        }
+
+        i++;
+    }
+    return decodificado;
+}
+
+//GERANDO ARQUIVO COMPACTADO
 void compactar(unsigned char str[]) {
-    FILE *arquivoCompactado = fopen("compactado.bin", "wb"); // Abre o arquivo binário em modo de escrita
+    FILE *arquivoCompactado = fopen("compactado.bin", "wb");
 
     if (arquivoCompactado == NULL) {
         printf("\nERRO AO ABRIR ARQUIVO COMPACTADO!!!\n");
@@ -201,18 +226,26 @@ void compactar(unsigned char str[]) {
     }
 
     int i = 0;
-    unsigned char mascara, byte = 0;
+    unsigned char byte = 0;
+    int bit_count = 0;
 
     while (str[i] != '\0') {
-        mascara = 1 << (7 - (i % 8));
-        byte |= (str[i] == '1') ? mascara : 0;
+        byte = (byte << 1) | (str[i] - '0');
+        bit_count++;
 
-        if ((i + 1) % 8 == 0) {
+        if (bit_count == 8) {
             fwrite(&byte, 1, 1, arquivoCompactado);
             byte = 0;
+            bit_count = 0;
         }
 
         i++;
+    }
+
+    // Se restarem bits não formando um byte completo, escreva o último byte
+    if (bit_count > 0) {
+        byte <<= (8 - bit_count);
+        fwrite(&byte, 1, 1, arquivoCompactado);
     }
 
     fclose(arquivoCompactado);
@@ -311,13 +344,13 @@ void imprimirTabelaComparativa(char **dicionario) {
 }
 
 // Função para imprimir o conteúdo codificado em um arquivo .txt
-void imprimir_em_arquivo(const char *nome_arquivo, const char *conteudo_binario) {
-    FILE *arquivo = fopen(nome_arquivo, "wb"); // Abre o arquivo binário em modo de escrita
-
+void imprimir_em_arquivo(const char *nome_arquivo, const char *conteudo) {
+    FILE *arquivo = fopen("compactado.txt", "w");//Nome do Arquivo que será criado, cujo conteúdo sera de valor binário
+    
     if (arquivo) {
-        fwrite(conteudo_binario, 1, strlen(conteudo_binario), arquivo);
+        fprintf(arquivo, "%s", conteudo);
         fclose(arquivo);
-        printf("\nO CONTEÚDO COMPACTADO FOI IMPRESSO NO ARQUIVO %s\n", nome_arquivo);
+        printf("\nO CONTEÚDO CODIFICADO FOI IMPRESSO NO ARQUIVO %s\n", "compactado.bin");
     } else {
         printf("\nERRO AO ABRIR ARQUIVO!!!\n");
     }
@@ -331,7 +364,7 @@ void charToBinaryString(unsigned char c, char *binaryString) {
     binaryString[8] = '\0'; // Adiciona o terminador nulo
 }
 
-// Função para escrever o conteúdo binário em um arquivo
+//ESCREVE O CONTEÚDO BINÁRIO EM UM ARQUIVO QUALQUER
 void escrever_binario_em_arquivo(const char *nome_arquivo, const char *conteudo_binario) {
     FILE *arquivo = fopen(nome_arquivo, "w"); // Abre o arquivo em modo de texto
 
@@ -343,7 +376,7 @@ void escrever_binario_em_arquivo(const char *nome_arquivo, const char *conteudo_
     }
 }
 
-// Função para calcular o tamanho de um arquivo em bytes
+//CALCULA O TAMANHO DE BYTES
 int tamanho_em_bytes(const char *nome_arquivo) {
     FILE *arquivo = fopen(nome_arquivo, "rb"); // Abre o arquivo em modo binário
 
@@ -424,4 +457,39 @@ int ler_converter_escrever_binario(const char *nome_arquivo, const char *nome_ar
     free(conteudo_binario);
 
     return 0;
+}
+
+// Dentro da função decodificar_arquivo
+void decodificar_arquivo(const char *nome_arquivo_binario, No *raiz) {
+    FILE *arquivoCompactado = fopen(nome_arquivo_binario, "rb");
+
+    if (arquivoCompactado == NULL) {
+        printf("\nERRO AO ABRIR ARQUIVO COMPACTADO!!!\n");
+        return;
+    }
+
+    fseek(arquivoCompactado, 0, SEEK_END);
+    long tamanho = ftell(arquivoCompactado);
+    fseek(arquivoCompactado, 0, SEEK_SET);
+
+    unsigned char *texto_codificado = (unsigned char *)malloc(tamanho);
+    fread(texto_codificado, 1, tamanho, arquivoCompactado);
+    fclose(arquivoCompactado);
+
+    char *bits_compactados = (char *)malloc(tamanho * 8 + 1);
+
+    int i, j;
+    for (i = 0; i < tamanho; i++) {
+        for (j = 7; j >= 0; j--) {
+            bits_compactados[(i * 8) + (7 - j)] = ((texto_codificado[i] >> j) & 1) + '0';
+        }
+    }
+
+    bits_compactados[tamanho * 8] = '\0';
+
+    char *decodificado = decodificar(bits_compactados, raiz);
+    printf("\nTEXTO DECODIFICADO: %s\n", decodificado);
+
+    free(texto_codificado);
+    free(bits_compactados);
 }

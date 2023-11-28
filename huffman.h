@@ -44,3 +44,5 @@ void escrever_binario_em_arquivo(const char *nome_arquivo, const char *conteudo_
 int tamanho_em_bytes(const char *nome_arquivo);
 void comparar_tamanhos(const char *arquivo1, const char *arquivo2);
 int ler_converter_escrever_binario(const char *nome_arquivo, const char *nome_arquivo_binario);
+char* decodificar(unsigned char texto[], No *raiz);
+void decodificar_arquivo(const char *nome_arquivo_binario, No *raiz);
