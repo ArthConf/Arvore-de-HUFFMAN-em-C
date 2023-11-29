@@ -399,9 +399,9 @@ void comparar_tamanhos(const char *arquivo1, const char *arquivo2) {
     if (tamanho1 != -1 && tamanho2 != -1) {
         printf("\nTamanho do arquivo %s: %d bytes\n", arquivo1, tamanho1);
         printf("Tamanho do arquivo %s: %d bytes\n", arquivo2, tamanho2);
-        int diferenca = tamanho1 - tamanho2;
+        float diferenca = tamanho1 - tamanho2;
         float percCompac = (diferenca * 100) / tamanho1;
-        printf("Diferença de bytes entre os dois arquivos: %d bytes\n", diferenca);
+        printf("Diferença de bytes entre os dois arquivos: %.2f bytes\n", diferenca);
         printf("\nPercentual de compactação: %.2f%%\n\n",percCompac);
     }
 }
