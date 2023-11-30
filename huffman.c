@@ -1,5 +1,6 @@
 #include "huffman.h"
 
+char *arquivo;
 //FREQUÊNCIA
 void inicializaTabela(unsigned int tab[]){
     int i;
@@ -254,7 +255,7 @@ void compactar(unsigned char str[]) {
 
 //CONTAR O TAMANHO DO TEXTO NO ARQUIVO
 int descobrir_tamanho(){
-    FILE *arq = fopen("teste.txt", "r");
+    FILE *arq = fopen(arquivo, "r");
     int tam = 0;
 
     if(arq){
@@ -269,7 +270,7 @@ int descobrir_tamanho(){
 
 //LEITURA DE ARQUIVO
 void ler_texto(unsigned char *texto) {
-    FILE *arq = fopen("teste.txt", "r"); // Aqui deve colocar o arquivo que deseja compactar
+    FILE *arq = fopen(arquivo, "r"); // Aqui deve colocar o arquivo que deseja compactar
     unsigned char letra;
     int i = 0;
 

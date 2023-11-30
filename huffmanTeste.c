@@ -9,8 +9,9 @@
 //OBS: Este código funciona melhor quando o arquivo lido .txt não contém carácteres com acentos e o 'ç'
 #include "huffman.c"
 
-int main() {
+int main(int argc, char *argv[]) {
     int resp;
+    arquivo = argv[1];
     printf("Olá usuário, seja bem vindo ao software COMPACTHANOS :D\n\n");
     printf("Você deseja compactar o seu arquivo txt?\n\n1-> Sim\n2-> Nao\n\nDigite: ");
     scanf(" %d",&resp);
@@ -24,7 +25,7 @@ int main() {
         char **dicionario;
         char *codificado, *decodificado;
 
-        FILE *arq = fopen("teste.txt", "r");
+        FILE *arq = fopen(argv[1], "r");
 
         tam = descobrir_tamanho(); 
         printf("QUANTIDADE DE CARACTERES: %d\n", tam); //QUANTIDADE DE CARACTER 
@@ -62,11 +63,11 @@ int main() {
     printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 
     // Convertendo teste.txt para um arquivo binário teste.bin
-    if (ler_converter_escrever_binario("teste.txt", "teste.bin") == 0) {
-        printf("O arquivo teste.txt foi transformado em binário com sucesso!\n");
+    if (ler_converter_escrever_binario(argv[1], "teste.bin") == 0) {
+        printf("O arquivo %s foi transformado em binário com sucesso!\n",argv[1]);
     }
     //COMPARAÇÃO DE TAMANHOS ENTRE OS ARQUIVOS BINÁRIO ORIGINAL E COMPACTADO PÓS HUFFMAN
-    comparar_tamanhos("teste.bin", "compactado.bin");
+    comparar_tamanhos(arquivo, "compactado.bin");
     //DECODIFICANDO O ARQUIVO COMPACTADO.BIN E IMPRIMINDO O QUE ESTA ESCRITO EM BINÁRIO
     decodificar_arquivo("compactado.bin", arvore);
     //LIBERAR MEMÓRIA
